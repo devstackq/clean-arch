@@ -1,0 +1,14 @@
+{
+    "port": 8080,
+    "auth": {
+        "hash_salt": "haashsalt69",
+        "signin_key": "signin_key",
+        "token_ttl":86400
+    },
+    "mongo": {
+        "uri": "mongodb://mongodb:27017",
+        "name":"testdb",
+        "user_collection" :"users",
+        "bookmark_collection":"bookmarks"
+    }
+}
