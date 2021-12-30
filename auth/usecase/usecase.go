@@ -48,9 +48,9 @@ func (auth *AuthUseCase) SignUp(ctx context.Context, username, password string) 
 
 func (auth *AuthUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
 	//	check pwd, get salt Db;
-
 	return "", nil
 }
+
 func (auth *AuthUseCase) ParseToken(ctx context.Context, accessToken string) *models.User {
 	return nil
 }

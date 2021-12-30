@@ -48,6 +48,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
+
 	w.WriteHeader(200)
 	http.Redirect(w, r, "/signin", 302)
 }

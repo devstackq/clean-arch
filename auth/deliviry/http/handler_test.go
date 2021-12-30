@@ -30,7 +30,7 @@ func TestSignup(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	hr := &Handler{}
-	hr.authUseCase = mockService
+	// hr.authUseCase = mockService
 	handler := http.HandlerFunc(hr.SignUp)
 
 	handler.ServeHTTP(response, req)

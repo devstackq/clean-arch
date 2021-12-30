@@ -1,2 +1,20 @@
 incapsulation - не важно как реализована логика сервиса или как бд отбрабатывает, у нас есть интерфейсы
 этого достаточно, а как внутри бех разницы
+
+Srp - 1 func/method - to do 1 function(validate, prepareApp, sort, etc)
+
+//Open/closed?
+//type Home struct {window, door, nameRoom} -> TurnHeat(); TurnLight(),
+//type HomeSmarter interface {TurnLight(), TurnHeat(), TurnCondicioner() }
+
+//type Kitchen struct{wallpaper} TurnLight(); !change parent method; but override
+//type BathRoom struct -> TurnHeat(){override own logic}; !change parent method; but override
+
+//for App - type StorageConnecter  interface{
+//Mongo
+//Psql
+//etc
+//}
+
+
+Pattern fabric - XStruct{}; XInterface; 
