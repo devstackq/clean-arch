@@ -14,34 +14,34 @@ import (
 	"github.com/devstackq/go-clean/auth/usecase"
 	"github.com/devstackq/go-clean/dbFabric"
 	"github.com/spf13/viper"
-
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//config server; app; init db
-//create custom server
 type App struct {
 	httpServer  http.Server
 	authUseCase auth.UseCase
 }
 
-// Server Run; docker - mongo start
-
+TODO : flex transport layer - with fabric
+TODO docker compose - mongo/sql
+https://dev.to/itscosmas/how-to-set-up-a-local-development-workflow-with-docker-for-your-go-apps-with-mongodb-and-mongo-express-f99
 //return preapred repo-service
 func NewApp() *App {
-	//	storage2 := dbFabric.NewPostgresStorage("postgres", "password", "localhost:", "5432", "testdb")
-	//	psqlDb, err := storage2.InitDb()
-	//	userPsqlRepo := psqlRepo.NewUserRepository(psqlDb.(*sql.DB))
+	// storage := dbFabric.NewPostgresStorage("postgres", "password", "localhost:", "5432", "testdb")
+	// psqlDb, err := storage.InitDb()
+	// if err != nil {
+	// 	log.Print(err)
+	// 	return nil
+	// }
+	// psqlRepo := psql.NewUserRepository(psqlDb.(*sql.DB))
 
 	//maybe use data from viper ?
 	storage := dbFabric.NewMongoStorage("mongo", "", "mongodb://mongodb:", "27017", "testdb")
 	mgDb, err := storage.InitDb()
-
 	if err != nil {
 		log.Print(err, 1)
 		return nil
 	}
-	// log.Print(mgDb.(*mongo.Database), "mongo db")
 	userMongoRepo := mongoRepo.NewUserRepository(mgDb.(*mongo.Database), viper.GetString("mongo.user_collection"))
 	return &App{
 		authUseCase: usecase.NewAuthUseCase(userMongoRepo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),

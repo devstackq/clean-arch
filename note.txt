@@ -17,4 +17,5 @@ Srp - 1 func/method - to do 1 function(validate, prepareApp, sort, etc)
 //}
 
 
-Pattern fabric - XStruct{}; XInterface; 
+Pattern fabric - XStruct{}; XInterface; YStruct -> каждая стурутра по своему реализовывает
+like polymorphism
