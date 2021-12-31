@@ -17,13 +17,13 @@ import (
 //DI - each db - own realize; - condition - interface
 //AuthUseCase struct - for relation between - layers; interface  - poly, DI;
 type AuthUseCase struct {
-	userRepo       auth.UserRepository
+	userRepo       auth.UserRepositoryInterface
 	HashSalt       []byte
 	signinKey      []byte
 	expireDuration time.Duration
 }
 
-func NewAuthUseCase(userRepo auth.UserRepository, hashSalt []byte, signinKey []byte, tokenTTLSecond time.Duration) *AuthUseCase {
+func NewAuthUseCase(userRepo auth.UserRepositoryInterface, hashSalt []byte, signinKey []byte, tokenTTLSecond time.Duration) *AuthUseCase {
 	return &AuthUseCase{
 		userRepo:       userRepo,
 		HashSalt:       hashSalt,

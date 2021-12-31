@@ -9,42 +9,46 @@ import (
 	"time"
 
 	"github.com/devstackq/go-clean/auth"
+	"github.com/devstackq/go-clean/db"
+
 	handler "github.com/devstackq/go-clean/auth/deliviry/http"
 	mongoRepo "github.com/devstackq/go-clean/auth/repository/mongo"
 	"github.com/devstackq/go-clean/auth/usecase"
-	"github.com/devstackq/go-clean/dbFabric"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/mongo"
+	"google.golang.org/grpc"
 )
 
 type App struct {
 	httpServer  http.Server
+	grpcServer  grpc.Server
 	authUseCase auth.UseCase
 }
+
+interface {Signup, Signin}; stuct Grpc - own realize; struct http - own realize, grpcServer
+1 create initServer - http & grpc; 2 add delivery proto, hanlder, etc
 
 TODO : flex transport layer - with fabric
 TODO docker compose - mongo/sql
 https://dev.to/itscosmas/how-to-set-up-a-local-development-workflow-with-docker-for-your-go-apps-with-mongodb-and-mongo-express-f99
 //return preapred repo-service
-func NewApp() *App {
-	// storage := dbFabric.NewPostgresStorage("postgres", "password", "localhost:", "5432", "testdb")
-	// psqlDb, err := storage.InitDb()
-	// if err != nil {
-	// 	log.Print(err)
-	// 	return nil
-	// }
-	// psqlRepo := psql.NewUserRepository(psqlDb.(*sql.DB))
+https://github.com/bxcodec/go-clean-arch-grpc/blob/master/main.go
 
-	//maybe use data from viper ?
-	storage := dbFabric.NewMongoStorage("mongo", "", "mongodb://mongodb:", "27017", "testdb")
-	mgDb, err := storage.InitDb()
-	if err != nil {
-		log.Print(err, 1)
-		return nil
-	}
-	userMongoRepo := mongoRepo.NewUserRepository(mgDb.(*mongo.Database), viper.GetString("mongo.user_collection"))
+func NewApp() *App {
+	//psql case
+	// storage2 := db.NewPostgresStorage("postgres", "password", "localhost:", "5432", "testdb")
+	// dbSql, err := storage2.InitPostgresDb()
+	//log.Println(err,1)
+	// repoSql := psql.NewUserRepository(dbSql)
+	// log.Print(repoSql, "init psql", err)
+	//mongo case
+	storage := db.NewMongoStorage("mongo", "", "mongodb://mongodb:", "27017", "testdb")
+	dbMongo, err := storage.InitMongoDb()
+	log.Print(err, 1)
+	repoMongo := mongoRepo.NewUserRepository(dbMongo, viper.GetString("mongo.user_collection"))
+	log.Print(repoMongo, "mongo init")
+
 	return &App{
-		authUseCase: usecase.NewAuthUseCase(userMongoRepo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
+		authUseCase: usecase.NewAuthUseCase(repoMongo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
 	}
 }
 
@@ -54,6 +58,13 @@ func (app *App) Run(port string) error {
 	http.HandleFunc("/signup", hr.SignUp) //register handler
 	// http.HandleFunc("/signin", hr.Signin) //register handler
 
+	//grpc
+	// app.grpcServer = *grpc.NewServer()
+	// list, err := net.Listen("tcp", ":8000")
+	// if err != nil {
+	// 	fmt.Println("SOMETHING HAPPEN")
+	// }
+	// app.grpcServer.Serve(list)
 	//custom http server
 	app.httpServer = http.Server{
 		Addr: ":" + port,
