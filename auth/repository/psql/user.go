@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/devstackq/go-clean/models"
+	"github.com/devstackq/go-clean/auth/models"
 )
 
 type UserRepository struct {

@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"github.com/devstackq/go-clean/models"
+	"github.com/devstackq/go-clean/auth/models"
 )
 
 type UserRepositoryInterface interface {

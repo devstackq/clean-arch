@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/devstackq/go-clean/models"
+	"github.com/devstackq/go-clean/auth/models"
 	"github.com/stretchr/testify/mock"
 )
 

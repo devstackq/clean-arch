@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/devstackq/go-clean/auth/models"
 	"github.com/devstackq/go-clean/auth/usecase"
-	"github.com/devstackq/go-clean/models"
 	"github.com/stretchr/testify/assert"
 )
 

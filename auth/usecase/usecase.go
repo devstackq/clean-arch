@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/devstackq/go-clean/auth"
-	"github.com/devstackq/go-clean/models"
+	"github.com/devstackq/go-clean/auth/models"
 )
 
 //repo;

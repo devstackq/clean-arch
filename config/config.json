@@ -1,5 +1,5 @@
 {
-    "port": 8080,
+    "port": 6969,
     "auth": {
         "hash_salt": "haashsalt69",
         "signin_key": "signin_key",

@@ -20,14 +20,15 @@ import (
 )
 
 type App struct {
-	httpServer  http.Server
-	grpcServer  grpc.Server
+	http        http.Server
+	grpc        grpc.Server
 	authUseCase auth.UseCase
 }
 
 // interface {Signup, Signin}; stuct Grpc - own realize; struct http - own realize, grpcServer
 // 1 create initServer - http & grpc; 2 add delivery proto, hanlder, etc
 
+//todo context all layer
 // TODO : flex transport layer - with fabric
 // TODO docker compose - mongo/sql
 // https://dev.to/itscosmas/how-to-set-up-a-local-development-workflow-with-docker-for-your-go-apps-with-mongodb-and-mongo-express-f99
@@ -36,46 +37,49 @@ type App struct {
 
 func NewApp() *App {
 	//psql case
-	// storage2 := db.NewPostgresStorage("postgres", "password", "localhost:", "5432", "testdb")
+	// storage2 := db.NewPostgresStorage("postgres", "password", "localhost:", "5432", "testdb") os.LookUp
 	// dbSql, err := storage2.InitPostgresDb()
-	//log.Println(err,1)
+	// log.Println(err,1)
 	// repoSql := psql.NewUserRepository(dbSql)
 	// log.Print(repoSql, "init psql", err)
 
 	//mongo case
-	storage := db.NewMongoStorage("mongo", "", "mongodb://mongodb:", "27017", "testdb")
+	storage := db.NewMongoStorage("mongo", "", "mongo", "27017", "testdb") // os.LookUp
 	dbMongo, err := storage.InitMongoDb()
-	log.Print(err, 1)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
 	repoMongo := mongoRepo.NewUserRepository(dbMongo, viper.GetString("mongo.user_collection"))
 	log.Print(repoMongo, "mongo init")
+	// db, err := getDb("psql")
 
 	http := delivery.NewHttpServer()
-	server := http.InitHttp("8000")
+	server := http.InitHTTP("8000") // os.LookUp
 
 	return &App{
 		authUseCase: usecase.NewAuthUseCase(repoMongo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
-		httpServer:  server,
+		http:        server,
 		// grpcServer: grpc,
 	}
+
 }
 func (a *App) initRoutes() {
-	//http || grpc
 	hr := handler.NewHandler(a.authUseCase)
 	http.HandleFunc("/signup", hr.SignUp) //register handler
 }
 
 func (app *App) Run(port string) error {
-
+	//grpc || http run
 	app.initRoutes()
 	//app.InitGrpcRoutes()
-	//grpc || http run
 	go func() {
-		if err := app.httpServer.ListenAndServe(); err != nil {
+		if err := app.http.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
 	}()
 
-	// //gracefull shutdown
+	//gracefull shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, os.Interrupt)
 	<-quit
@@ -83,5 +87,5 @@ func (app *App) Run(port string) error {
 	ctx, shutdown := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdown()
 
-	return app.httpServer.Shutdown(ctx)
+	return app.http.Shutdown(ctx)
 }

@@ -37,3 +37,7 @@ func (c *Config) NewConfig(name, password, url, port, databaseName string) Confi
 
 //type Kitchen struct{wallpaper} TurnLight(); !change parent method; but override
 //type BathRoom struct -> TurnHeat(){override own logic}; !change parent method; but override
+
+func getDB(db interface{}){
+	// switch {} InitDb()
+}

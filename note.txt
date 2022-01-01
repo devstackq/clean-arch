@@ -19,3 +19,21 @@ Srp - 1 func/method - to do 1 function(validate, prepareApp, sort, etc)
 
 Pattern fabric - XStruct{}; XInterface; YStruct -> каждая стурутра по своему реализовывает
 like polymorphism
+
+
+clousers - func() func() int {
+    i := 10
+    retun func()int{
+        i++
+        return i
+    }
+}
+
+p := 10
+v := &p
+
+f(v)
+
+func test(n *int) {
+    *n = 100//write new value v, p variable, pointer
+}
