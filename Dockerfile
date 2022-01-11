@@ -1,19 +1,30 @@
-#pull base image
+#pull golang base  image
 FROM golang:latest
 
-RUN mdkir app
-
-WORKDIR /app
-
-COPY go.mod .
-COPY go.sum .
+RUN mkdir -p app
 # ENV GOPATH=/
-
-RUN go mod download
-# copy project to current app dir
+WORKDIR /app 
+# add all in folder app
+ADD . /app
 COPY . .
+# ADD go.mod go.sum ./
+# downlaod dependency
+# RUN go mod download
+RUN go get
+# RUN go build
+# copy main file to curent image
+# COPY cmd/main.go ./
+# copy source code
+# COPY . .
+# run app  in os linux then build app
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./cmd/main .
+# RUN  go build -o /projectx
 
-RUN CGO_ENABLED=0 GOOS = linux  go build -o /app/cmd/main main.go
-
-# CMD ["/app/cmd/main"]
-ENTRYPOINT ["/app/cmd/main"]
+# create volume
+# VOLUME [ "/app/shared" ]
+# set entrypoint
+# ENTRYPOINT [ "./cmd/main" ]
+#open out port for OS, inside container app start port - 6969
+EXPOSE 6969
+# command with arg - projectx; when docker run
+CMD ["./projectx"]

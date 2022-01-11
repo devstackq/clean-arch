@@ -41,7 +41,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := context.Background()
-	err = h.authUseCase.SignUp(ctx, &input)
+	err = h.authUseCase.SignUp(ctx, input)
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(err.Error())
@@ -59,7 +59,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	bytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServer)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
@@ -71,19 +71,37 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := context.Background()
-	err = h.authUseCase.SignIn(ctx, input.Username, input.Password)
+	res, err := h.authUseCase.SignIn(ctx, input.Username, input.Password)
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
+	log.Print(res)
 	//parseTOken
 	w.WriteHeader(200)
 }
 
-func InitRoutes(useCase auth.authUseCase) {
+func InitRoutes(useCase auth.UseCase) {
 	hr := NewHandler(useCase)
 	http.HandleFunc("/signup", hr.SignUp) //register handler
 	http.HandleFunc("/signin", hr.SignIn) //register handler
 }
-	
+
+// [Interface]
+// Address = 10.0.0.1/24
+// SaveConfig = true
+// PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING ->
+// PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING>
+// ListenPort = 3785
+// PrivateKey = mAyHVBewjYa8zeEGL+Y5xkMyplVaLaev4FMuKshQx1A=
+
+// [PEER]
+// PublicKey = 5j8q9wnQjnDx31E9KarACMbriviBeI1mbBGCrWy+h2Q=
+// AllowedIPs = 110.0.0.2/32
+// [PEER]
+// PublicKey = dDQ/C/Xd0xIpZ40dYjVWJ4m53ddVc/Z3jV/yUmGoF3s=
+// AllowedIPs = 110.0.0.3/32
+// [PEER]
+// PublicKey = vBtxVLa6CeRki5+I7AHIbe4CJv2oKsKsyyqToKYHiGc=
+// AllowedIPs = 110.0.0.4/32

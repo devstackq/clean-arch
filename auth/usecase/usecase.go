@@ -34,9 +34,9 @@ func NewAuthUseCase(userRepo auth.UserRepositoryInterface, hashSalt []byte, sign
 
 func (auth *AuthUseCase) SignUp(ctx context.Context, user *models.User) error {
 	//is Good || call handler layer ?
-	refactor, use hashsalt value from config
+	// refactor, use hashsalt value from config
 
-	auth.HashSalt = auth.GenerateSalt(16) //salt, then save Db 
+	auth.HashSalt = auth.GenerateSalt(16) //salt, then save Db
 	user.Password = auth.hashPassword(user.Password)
 
 	log.Print("call service auth, use case,  Signup", user)
