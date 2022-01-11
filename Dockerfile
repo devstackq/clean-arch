@@ -1,10 +1,19 @@
 #pull base image
-FROM golang:alpine
+FROM golang:latest
 
-RUN go version
-ENV GOPATH=/
+RUN mdkir app
 
-COPY ./ ./
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+# ENV GOPATH=/
 
 RUN go mod download
-RUN go build -o projectx ./cmd/main.go
+# copy project to current app dir
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS = linux  go build -o /app/cmd/main main.go
+
+# CMD ["/app/cmd/main"]
+ENTRYPOINT ["/app/cmd/main"]

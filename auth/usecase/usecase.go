@@ -32,22 +32,21 @@ func NewAuthUseCase(userRepo auth.UserRepositoryInterface, hashSalt []byte, sign
 	}
 }
 
-func (auth *AuthUseCase) SignUp(ctx context.Context, username, password string) error {
+func (auth *AuthUseCase) SignUp(ctx context.Context, user *models.User) error {
 	//is Good || call handler layer ?
-	auth.HashSalt = auth.GenerateSalt(16) //salt, then save Db
-	hashedPwdSignup := auth.HashPassword(password)
+	refactor, use hashsalt value from config
 
-	user := &models.User{
-		Username: username,
-		Password: hashedPwdSignup,
-	}
+	auth.HashSalt = auth.GenerateSalt(16) //salt, then save Db 
+	user.Password = auth.hashPassword(user.Password)
+
 	log.Print("call service auth, use case,  Signup", user)
-	//	return auth.userRepo.CreateUser(ctx, user)
-	return nil
+	return auth.userRepo.CreateUser(ctx, user)
+	// return nil
 }
 
 func (auth *AuthUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
-	//	check pwd, get salt Db;
+	//get pwd by username form Db; ==  salt + hash(current password ) if ok -> handler ParseTOken ?
+	// auth.userRepo.GetUser(ctx, username, password)
 	return "", nil
 }
 
@@ -55,25 +54,26 @@ func (auth *AuthUseCase) ParseToken(ctx context.Context, accessToken string) *mo
 	return nil
 }
 
-func (auth *AuthUseCase) HashPassword(password string) string {
+func (auth *AuthUseCase) hashPassword(password string) string {
 	sha1Hasher := sha1.New()
-	// auth.hashSalt = auth.generateSalt(16)
 	pwdBytes := []byte(password)
 	//append hased password, with salt
-	pwdBytes = append(pwdBytes, []byte(auth.HashSalt)...)
+	pwdBytes = append(pwdBytes, auth.HashSalt...)
 
 	sha1Hasher.Write(pwdBytes)               //write bytes - to hasher
-	hashPasswordBytes := sha1Hasher.Sum(nil) //hash pwd
+	hashPasswordBytes := sha1Hasher.Sum(nil) //hashed password
 	//base64 convert
 	var base64EncodingPasswordHash = base64.URLEncoding.EncodeToString(hashPasswordBytes)
 	return base64EncodingPasswordHash
 }
 
 func (auth *AuthUseCase) GenerateSalt(saltSize int) []byte {
+	// s := auth.HashSalt
 	var salt = make([]byte, saltSize)
 	_, err := rand.Read(salt[:])
 	if err != nil {
-		panic(err) //recovery
+		// panic(err) //recovery
+		recover()
 	}
 	return salt
 }

@@ -12,16 +12,15 @@ import (
 	"github.com/devstackq/go-clean/db"
 	"github.com/devstackq/go-clean/delivery"
 
-	handler "github.com/devstackq/go-clean/auth/delivery/http"
+	authHttp "github.com/devstackq/go-clean/auth/delivery/http"
 	mongoRepo "github.com/devstackq/go-clean/auth/repository/mongo"
 	"github.com/devstackq/go-clean/auth/usecase"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
 
 type App struct {
-	http        http.Server
-	grpc        grpc.Server
+	httpServer http.Server
+	// grpc        grpc.Server
 	authUseCase auth.UseCase
 }
 
@@ -59,22 +58,18 @@ func NewApp() *App {
 
 	return &App{
 		authUseCase: usecase.NewAuthUseCase(repoMongo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
-		http:        server,
+		httpServer:  server,
 		// grpcServer: grpc,
 	}
 
 }
-func (a *App) initRoutes() {
-	hr := handler.NewHandler(a.authUseCase)
-	http.HandleFunc("/signup", hr.SignUp) //register handler
-}
 
 func (app *App) Run(port string) error {
 	//grpc || http run
-	app.initRoutes()
+	authHttp.InitRoutes(app.authUseCase)
 	//app.InitGrpcRoutes()
 	go func() {
-		if err := app.http.ListenAndServe(); err != nil {
+		if err := app.httpServer.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
 	}()
