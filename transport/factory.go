@@ -1,7 +1,7 @@
 package transport
 
 type Factory interface {
-	GetProtocol() Delivery
+	GetTransport() Transport
 }
 
 func GetFactory(typeProtocol string) Factory {
@@ -10,5 +10,6 @@ func GetFactory(typeProtocol string) Factory {
 	} else if typeProtocol == "grpc" {
 		return grpcFactory{}
 	}
+	// }else if typeProtocol == "mongo"
 	return nil
 }

@@ -11,17 +11,18 @@ import (
 	"github.com/devstackq/go-clean/auth/models"
 )
 
-//DI - fro mock
+//DI - for example mock
 type Handler struct {
 	authUseCase auth.UseCase
 }
 
-//for unit test; mock service
+//for example unit test; mock service
 func NewHandler(useCase auth.UseCase) *Handler {
 	return &Handler{authUseCase: useCase}
 }
 
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
+
 	defer r.Body.Close()
 
 	input := &models.User{}
@@ -53,6 +54,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
+
 	defer r.Body.Close()
 
 	input := &models.User{}
@@ -82,26 +84,9 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
+//register handlers
 func InitRoutes(useCase auth.UseCase) {
 	hr := NewHandler(useCase)
-	http.HandleFunc("/signup", hr.SignUp) //register handler
-	http.HandleFunc("/signin", hr.SignIn) //register handler
+	http.HandleFunc("/signup", hr.SignUp)
+	http.HandleFunc("/signin", hr.SignIn)
 }
-
-// [Interface]
-// Address = 10.0.0.1/24
-// SaveConfig = true
-// PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING ->
-// PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING>
-// ListenPort = 3785
-// PrivateKey = mAyHVBewjYa8zeEGL+Y5xkMyplVaLaev4FMuKshQx1A=
-
-// [PEER]
-// PublicKey = 5j8q9wnQjnDx31E9KarACMbriviBeI1mbBGCrWy+h2Q=
-// AllowedIPs = 110.0.0.2/32
-// [PEER]
-// PublicKey = dDQ/C/Xd0xIpZ40dYjVWJ4m53ddVc/Z3jV/yUmGoF3s=
-// AllowedIPs = 110.0.0.3/32
-// [PEER]
-// PublicKey = vBtxVLa6CeRki5+I7AHIbe4CJv2oKsKsyyqToKYHiGc=
-// AllowedIPs = 110.0.0.4/32

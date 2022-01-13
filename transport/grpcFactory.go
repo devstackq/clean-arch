@@ -2,6 +2,6 @@ package transport
 
 type grpcFactory struct{}
 
-func (factory grpcFactory) GetProtocol() Delivery {
+func (factory grpcFactory) GetTransport() Transport {
 	return &grpcServer{}
 }

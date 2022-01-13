@@ -2,6 +2,6 @@ package transport
 
 type httpFactory struct{}
 
-func (factory httpFactory) GetProtocol() Delivery {
+func (factory httpFactory) GetTransport() Transport {
 	return &httpServer{}
 }

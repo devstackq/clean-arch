@@ -3,9 +3,8 @@ package usecase
 import (
 	"context"
 	"crypto/sha1"
-	"encoding/base64"
+	"fmt"
 	"log"
-	"math/rand"
 	"time"
 
 	"github.com/devstackq/go-clean/auth"
@@ -33,20 +32,22 @@ func NewAuthUseCase(userRepo auth.UserRepositoryInterface, hashSalt []byte, sign
 }
 
 func (auth *AuthUseCase) SignUp(ctx context.Context, user *models.User) error {
-	//is Good || call handler layer ?
-	// refactor, use hashsalt value from config
-
-	auth.HashSalt = auth.GenerateSalt(16) //salt, then save Db
-	user.Password = auth.hashPassword(user.Password)
-
+	// auth.HashSalt = auth.generateSalt(16) //salt, then save Db
+	user.Password = auth.hashPassword(user.Password) //update password - to hash + salt
 	log.Print("call service auth, use case,  Signup", user)
 	return auth.userRepo.CreateUser(ctx, user)
-	// return nil
 }
 
 func (auth *AuthUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
-	//get pwd by username form Db; ==  salt + hash(current password ) if ok -> handler ParseTOken ?
-	// auth.userRepo.GetUser(ctx, username, password)
+	// dbPassword, err := auth.userRepo.GetUserPassword(ctx, username)
+	inputHashedPwd := auth.hashPassword(password)
+
+	user, err := auth.userRepo.GetUser(ctx, username, inputHashedPwd)
+	if err != nil {
+		return "", err
+	}
+	log.Print(user, "next step parse toke")
+	// auth.ParseToken()
 	return "", nil
 }
 
@@ -60,28 +61,10 @@ func (auth *AuthUseCase) hashPassword(password string) string {
 	//append hased password, with salt
 	pwdBytes = append(pwdBytes, auth.HashSalt...)
 
-	sha1Hasher.Write(pwdBytes)               //write bytes - to hasher
-	hashPasswordBytes := sha1Hasher.Sum(nil) //hashed password
-	//base64 convert
-	var base64EncodingPasswordHash = base64.URLEncoding.EncodeToString(hashPasswordBytes)
-	return base64EncodingPasswordHash
-}
+	sha1Hasher.Write(pwdBytes) //write bytes - to hasher
 
-func (auth *AuthUseCase) GenerateSalt(saltSize int) []byte {
-	// s := auth.HashSalt
-	var salt = make([]byte, saltSize)
-	_, err := rand.Read(salt[:])
-	if err != nil {
-		// panic(err) //recovery
-		recover()
-	}
-	return salt
-}
-
-//signin use func
-func (auth *AuthUseCase) ComparePassword(hashedPassword, inputPassword string) bool {
-	//reverse proccess
-	return hashedPassword == inputPassword
+	return fmt.Sprintf("%x", sha1Hasher.Sum(nil)) //hashed password
+	// base64EncodingPasswordHash := base64.URLEncoding.EncodeToString(hashPasswordBytes)
 }
 
 // mongo/psql download; write service check application

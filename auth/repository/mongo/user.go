@@ -76,4 +76,8 @@ func (ur UserRepository) GetUser(ctx context.Context, username, password string)
 	return toModel(user), nil
 }
 
+func (ur UserRepository) GetUserPassword(ctx context.Context, username string) (string, error) {
+	return "", nil
+}
+
 //create db; create colection; crud query

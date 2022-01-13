@@ -25,6 +25,6 @@ func (ur UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 
 func (ur UserRepository) GetUser(ctx context.Context, username, password string) (*models.User, error) {
 	log.Print("get User repo, pspl")
-
+	//select * from user where username = $1 and password = $2
 	return nil, nil
 }

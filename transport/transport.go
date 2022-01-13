@@ -1,5 +1,5 @@
 package transport
 
-type Delivery interface {
+type Transport interface {
 	InitTransport(port string) interface{}
 }
