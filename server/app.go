@@ -11,6 +11,7 @@ import (
 	"github.com/devstackq/go-clean/auth"
 	"github.com/devstackq/go-clean/db"
 	"github.com/devstackq/go-clean/delivery"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	authHttp "github.com/devstackq/go-clean/auth/delivery/http"
 	mongoRepo "github.com/devstackq/go-clean/auth/repository/mongo"
@@ -43,13 +44,16 @@ func NewApp() *App {
 	// log.Print(repoSql, "init psql", err)
 
 	//mongo case
-	storage := db.NewMongoStorage("mongo", "", "mongo", "27017", "testdb") // os.LookUp
-	dbMongo, err := storage.InitMongoDb()
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-	repoMongo := mongoRepo.NewUserRepository(dbMongo, viper.GetString("mongo.user_collection"))
+	// storage := db.NewMongoStorage("mongo", "", "mongo", "27017", "testdb") // os.LookUp
+	// dbMongo, err := storage.InitMongoDb()
+
+	//2 variant, fabric
+	dBFactory := db.NewDbFactory("mongo", "", "", "mongodb://mongo:", "27017", "users")
+	db, err := dBFactory.InitDb()
+
+	log.Print(db, err)
+
+	repoMongo := mongoRepo.NewUserRepository(db.(*mongo.Database), viper.GetString("mongo.user_collection"))
 	log.Print(repoMongo, "mongo init")
 	// db, err := getDb("psql")
 
