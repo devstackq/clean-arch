@@ -1,24 +1,24 @@
 package main
 
-import (
-	"log"
+// import (
+// 	"log"
 
-	"github.com/devstackq/go-clean/config"
-	"github.com/devstackq/go-clean/server"
-	"github.com/spf13/viper"
-	// _ "github.com/lib/pq"
-)
+// 	"github.com/devstackq/go-clean/config"
+// 	"github.com/devstackq/go-clean/server"
+// 	"github.com/spf13/viper"
+// 	// _ "github.com/lib/pq"
+// )
 
-func main() {
-	if err := config.Init(); err != nil {
-		log.Println(err, "viper")
-		return
-	}
-	app := server.NewApp()
+// func main() {
+// 	if err := config.Init(); err != nil {
+// 		log.Println(err, "viper")
+// 		return
+// 	}
+// 	app := server.NewApp()
 
-	if err := app.Run(viper.GetString("port")); err != nil {
-		log.Println(err)
-		return
-	}
+// 	if err := app.Run(viper.GetString("port")); err != nil {
+// 		log.Println(err)
+// 		return
+// 	}
 
-}
+// }

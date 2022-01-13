@@ -2,23 +2,40 @@ version: '3'
 services:
   #Go App
   go-app:
-    build: ./
-    command: ./projectx #run compile file
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context : .
+      # target : dev
+    # command: ./clean-arch_go-app #run compile file
     container_name: projectx
     depends_on: #depends container; first mongo start
-      - 'mongo'
+      - 'mongodb'
     environment:
       - PORT=6969 # get env data os.LookUp
       # - hash_salt=salt_hash99
     ports:
       - '6969:6969'
-  mongo:
+    volumes:
+      - './go-app:/opt/go-app:cached'
+    #Mongo
+  mongodb:
     image: 'mongo:latest'
     container_name: mongo
     ports:
       - "27017:27017"
     volumes:
-      - "mongodata:/data/db"
+      - "./mongodata:/data/db"
     restart: always # start docker || restart computer -> mongo container
     environment:
       - USER_COLLECTION=users
+    command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
+ # Mongo Express Web-based MongoDB admin interface
+  mongo_express:
+    image: mongo-express
+    container_name: mongo_express
+    depends_on:
+        - 'mongodb'
+    ports:
+        - '8081:8081'
+    restart: always

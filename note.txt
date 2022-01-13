@@ -58,3 +58,24 @@ level logs, info, error, warn, type Logs;
 
 Приложение, работающее во время выполнения сборки мусора, называется
 мутатором
+
+mongoConfig
+
+// Config object
+type Config struct {
+	Env     string        `env:"ENV"`
+	MongoDB MongoDBConfig `json:"mongodb"`
+	Host    string        `env:"APP_HOST"`
+	Port    string        `env:"APP_PORT"`
+}
+
+func GetConfig() Config {
+	return Config{
+		Env:     os.Getenv("ENV"),
+		MongoDB: GetMongoDBConfig(),
+		Host:    os.Getenv("APP_HOST"),
+		Port:    os.Getenv("APP_PORT"),
+	}
+}
+
+//composite configs
