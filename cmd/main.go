@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/devstackq/go-clean/config"
 	"github.com/devstackq/go-clean/server"
@@ -10,17 +9,7 @@ import (
 	// _ "github.com/lib/pq"
 )
 
-func clousure() func() int {
-	i := 10
-	i++
-	//here1
-	return func() int {
-		return i
-	}
-}
 func main() {
-	clousure()//here 2
-
 	if err := config.Init(); err != nil {
 		log.Println(err, "viper")
 		return
@@ -31,12 +20,5 @@ func main() {
 		log.Println(err)
 		return
 	}
-	//refactor
-	file, err := os.OpenFile("info.log", os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Println(err)
-	}
-	defer file.Close()
-	log.SetOutput(file)
-	log.Print("logger start")
+
 }

@@ -1,25 +1,19 @@
-package delivery
+package transport
 
 import (
 	"net/http"
 	"time"
 )
 
-type server struct{}
+type httpServer struct{}
 
-func NewHttpServer() server {
-	return server{}
-}
-
-func (h server) InitHTTP(port string) http.Server {
+func (h httpServer) InitTransport(port string) interface{} {
 
 	return http.Server{
 		Addr: ":" + port,
-		// Handler: ,
+		// Handler:        authHttp.InitRoutes(usecase),
 		ReadTimeout:    10 * time.Second, // each 10 sec read
 		WriteTimeout:   10 * time.Second, //each 10sec write
 		MaxHeaderBytes: 1 << 20,          // max 20 mg
 	}
 }
-
-func (server) InitGrpc() {}

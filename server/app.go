@@ -10,7 +10,7 @@ import (
 
 	"github.com/devstackq/go-clean/auth"
 	"github.com/devstackq/go-clean/db"
-	"github.com/devstackq/go-clean/delivery"
+	"github.com/devstackq/go-clean/transport"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	authHttp "github.com/devstackq/go-clean/auth/delivery/http"
@@ -58,15 +58,15 @@ func NewApp() *App {
 	log.Print(repoMongo, "mongo init")
 	// db, err := getDb("psql")
 
-	http := delivery.NewHttpServer()
-	server := http.InitHTTP("8000") // os.LookUp
+	factory := transport.GetFactory("http")
+	protocol := factory.GetProtocol()
+	server := protocol.InitTransport("8080")
 
 	return &App{
 		authUseCase: usecase.NewAuthUseCase(repoMongo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
-		httpServer:  server,
+		httpServer:  server.(http.Server),
 		// grpcServer: grpc,
 	}
-
 }
 
 func (app *App) Run(port string) error {
@@ -78,6 +78,14 @@ func (app *App) Run(port string) error {
 			log.Println(err)
 		}
 	}()
+	//refactor
+	file, err := os.OpenFile("info.log", os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+	defer file.Close()
+	log.SetOutput(file)
+	log.Print("logger start")
 
 	//gracefull shutdown
 	quit := make(chan os.Signal, 1)
