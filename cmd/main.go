@@ -10,7 +10,16 @@ import (
 	// _ "github.com/lib/pq"
 )
 
+func clousure() func() int {
+	i := 10
+	i++
+	//here1
+	return func() int {
+		return i
+	}
+}
 func main() {
+	clousure()//here 2
 
 	if err := config.Init(); err != nil {
 		log.Println(err, "viper")

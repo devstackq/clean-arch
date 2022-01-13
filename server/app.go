@@ -48,8 +48,9 @@ func NewApp() *App {
 	// dbMongo, err := storage.InitMongoDb()
 
 	//2 variant, fabric
-	dBFactory := db.NewDbFactory("mongo", "", "", "mongodb://mongo:", "27017", "users")
-	db, err := dBFactory.InitDb()
+	f := db.GetDbFactory("mongodb")
+	f.SetConfig("user", "password", "mongodb://mongo", "27017", "users")
+	db, err := f.InitDb()
 
 	log.Print(db, err)
 
