@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -10,12 +11,12 @@ import (
 
 	"github.com/devstackq/go-clean/auth"
 	authHttp "github.com/devstackq/go-clean/auth/delivery/http"
-	mongoRepo "github.com/devstackq/go-clean/auth/repository/mongo"
+	"github.com/devstackq/go-clean/auth/repository/psql"
 	"github.com/devstackq/go-clean/auth/usecase"
 	"github.com/devstackq/go-clean/db"
 	"github.com/devstackq/go-clean/transport"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type App struct {
@@ -37,19 +38,26 @@ func NewApp() *App {
 	// dbMongo, err := storage.InitMongoDb()
 
 	//2 variant db, method fabric
-	mongoObject := db.NewDbObject("mongodb", viper.GetString("mongo.username"), viper.GetString("mongo.password"), viper.GetString("mongo.uri"), viper.GetString("mongo.port"), viper.GetString("mongo.dbName"), viper.GetString("mongo.user_collection"))
-	// db.SetConfig("", "", viper.GetString("mongo.uri"), "27017", "users")
-	db, err := mongoObject.InitDb()
+	// mongoObject := db.NewDbObject("mongodb", viper.GetString("mongo.username"), viper.GetString("mongo.password"), viper.GetString("mongo.uri"), viper.GetString("mongo.port"), viper.GetString("mongo.dbName"), viper.GetString("mongo.user_collection"))
+	// // db.SetConfig("", "", viper.GetString("mongo.uri"), "27017", "users")
+	// db, err := mongoObject.InitDb()
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return nil
+	// }
+	// log.Println("init db")
+	sqlObject := db.NewDbObject("postgresql", viper.GetString("postgres.username"), viper.GetString("potgres.password"), viper.GetString("postgres.host"), viper.GetString("postgres.port"), viper.GetString("postgres.dbName"), viper.GetString("postgres.tableName"))
+	db, err := sqlObject.InitDb()
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
-	log.Println("init db")
+	repoSql := psql.NewUserRepository(db.(*sql.DB))
 
-	repoMongo := mongoRepo.NewUserRepository(db.(*mongo.Database), viper.GetString("mongo.user_collection"))
-	log.Print(repoMongo, "init repo")
+	// repoMongo := mongoRepo.NewUserRepository(db.(*mongo.Database), viper.GetString("mongo.user_collection"))
+	// log.Print(repoMongo, "init repo")
 	return &App{
-		authUseCase: usecase.NewAuthUseCase(repoMongo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
+		authUseCase: usecase.NewAuthUseCase(repoSql, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
 		// httpServer:  server.(http.Server),
 	}
 }
@@ -59,6 +67,7 @@ func (app *App) Run(port string) error {
 	factory := transport.GetFactory("http")
 	transportProtocol := factory.GetTransport()
 	server := transportProtocol.InitTransport(viper.GetString("port")).(http.Server)
+	log.Print("init transport")
 
 	authHttp.InitRoutes(app.authUseCase)
 

@@ -13,16 +13,14 @@ services:
     restart: always # start docker || restart computer -> mongo container
     # environment:
       # - MONGO_INITDB_DATABASE= testdb
- # Mongo Express Web-based MongoDB admin interface
-  mongo_express:
-    image: mongo-express
-    container_name: mongo_express
-    depends_on:
-        - mongodb
+  postgres:
+    image: postgres:latest
     ports:
-        - 8081:8081
-    restart: always
-      #Go App
+      - "5432:5432"
+    restart: always 
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   go-app:
     # tty: true
     # stdin_open: true
