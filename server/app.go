@@ -37,18 +37,19 @@ func NewApp() *App {
 	// dbMongo, err := storage.InitMongoDb()
 
 	//2 variant db, method fabric
-	factoryDb := db.GetDbFactory("mongodb")
-	factoryDb.SetConfig("", "", viper.GetString("mongo.uri"), "27017", "users")
-	db, err := factoryDb.InitDb()
+	mongoObject := db.NewDbObject("mongodb", viper.GetString("mongo.username"), viper.GetString("mongo.password"), viper.GetString("mongo.uri"), viper.GetString("mongo.port"), viper.GetString("mongo.dbName"), viper.GetString("mongo.user_collection"))
+	// db.SetConfig("", "", viper.GetString("mongo.uri"), "27017", "users")
+	db, err := mongoObject.InitDb()
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
-	repoMongo := mongoRepo.NewUserRepository(db.(*mongo.Database), viper.GetString("mongo.user_collection"))
-	log.Print(repoMongo, "mongo repo init")
+	log.Println("init db")
 
+	repoMongo := mongoRepo.NewUserRepository(db.(*mongo.Database), viper.GetString("mongo.user_collection"))
+	log.Print(repoMongo, "init repo")
 	return &App{
-		authUseCase: usecase.NewAuthUseCase(nil, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
+		authUseCase: usecase.NewAuthUseCase(repoMongo, []byte(viper.GetString("auth.hash_salt")), []byte(viper.GetString("auth.secret_key")), viper.GetDuration("auth.token_ttl")),
 		// httpServer:  server.(http.Server),
 	}
 }
@@ -66,7 +67,7 @@ func (app *App) Run(port string) error {
 			log.Println(err)
 		}
 	}()
-	log.Print("run server port; ", viper.GetString("port"))
+	log.Print("run server port: ", viper.GetString("port"))
 
 	//refactor logger go func()
 	// file, err := os.OpenFile("info.log", os.O_CREATE|os.O_APPEND, 0644)

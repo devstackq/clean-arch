@@ -4,12 +4,16 @@ type Factory interface {
 	GetTransport() Transport
 }
 
-func GetFactory(typeProtocol string) Factory {
-	if typeProtocol == "http" {
+// type FactoryDb interface {
+// 	GetDatabase() Database
+// }
+
+func GetFactory(typeFactory string) Factory {
+	if typeFactory == "http" {
 		return httpFactory{}
-	} else if typeProtocol == "grpc" {
+	} else if typeFactory == "grpc" {
 		return grpcFactory{}
 	}
-	// }else if typeProtocol == "mongo"
+	// }else if typeFactory == "mongo"
 	return nil
 }

@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,12 +9,13 @@ import (
 )
 
 type MongoDb struct {
-	DbFactory
+	Config
 }
 
 func (m *MongoDb) InitDb() (interface{}, error) {
-	log.Print(m.DbFactory.host, m.DbFactory.port)
-	client, err := mongo.NewClient(options.Client().ApplyURI(m.DbFactory.host + m.DbFactory.port))
+	//"mongodb://" + "mongo" + ":" + "password" + "@" + "mongo:27017"
+	//.SetAuth(cred)
+	client, err := mongo.NewClient(options.Client().ApplyURI(m.Config.host + m.Config.port))
 	if err != nil {
 		return nil, err
 	}
@@ -25,13 +25,10 @@ func (m *MongoDb) InitDb() (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		return nil, err
 	}
-	log.Print("init mongo")
-
 	// m.db = client.Database(m.Config.name)
-	return client.Database(m.DbFactory.databaseName), nil
+	return client.Database(m.Config.tableName), nil
 }

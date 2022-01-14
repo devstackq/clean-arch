@@ -9,11 +9,11 @@ import (
 // func (p *PostgreSql) InitPostgresDb() (*sql.DB, error) {}
 
 type PostgreSqlDb struct {
-	DbFactory
+	Config
 }
 
 func (p *PostgreSqlDb) InitDb() (interface{}, error) {
-	db, err := sql.Open("postgres", p.DbFactory.host+"://"+p.DbFactory.port+p.DbFactory.user+"@"+p.DbFactory.password+p.DbFactory.databaseName+"?sslmode=disable")
+	db, err := sql.Open("postgres", p.Config.host+"://"+p.Config.port+p.Config.user+"@"+p.Config.password+p.Config.dbName+"?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}

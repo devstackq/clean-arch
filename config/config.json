@@ -6,8 +6,11 @@
         "token_ttl":86400
     },
     "mongo": {
-        "uri":"mongodb://mongo:",
-        "name":"testdb",
+        "uri":"mongodb://127.0.0.1:",
+        "port":"27017",
+        "dbName":"testdb",
+        "username":"user",
+        "password":"password",
         "user_collection" :"users",
         "bookmark_collection":"bookmarks"
     }
