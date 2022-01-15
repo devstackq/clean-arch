@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,6 +16,8 @@ type MongoDb struct {
 func (m *MongoDb) InitDb() (interface{}, error) {
 	//"mongodb://" + "mongo" + ":" + "password" + "@" + "mongo:27017"
 	//.SetAuth(cred)
+
+	log.Print(m.Config)
 	client, err := mongo.NewClient(options.Client().ApplyURI(m.Config.host + m.Config.port))
 	if err != nil {
 		return nil, err
